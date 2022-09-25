@@ -3,20 +3,22 @@ import React, { useRef, useState, useEffect } from "react";
 import * as tf from "@tensorflow/tfjs";
 // 1. TODO - Import required model here
 // e.g. import * as tfmodel from "@tensorflow-models/tfmodel";
+import * as cocossd from "@tensorflow-models/coco-ssd";
 import Webcam from "react-webcam";
 import "./App.css";
 // 2. TODO - Import drawing utility here
 // e.g. import { drawRect } from "./utilities";
-
+import {drawRectangle} from "./utilities";
 function App() {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
-
+  var objectName = "";
+  const renderText = "we detect a "+objectName;
   // Main function
   const runCoco = async () => {
     // 3. TODO - Load network 
     // e.g. const net = await cocossd.load();
-    
+    const net = await cocossd.load();
     //  Loop and detect hands
     setInterval(() => {
       detect(net);
@@ -45,12 +47,15 @@ function App() {
 
       // 4. TODO - Make Detections
       // e.g. const obj = await net.detect(video);
-
+      const obj = await net.detect(video);
+      console.log(obj)
+      objectName = obj[0]["class"];
       // Draw mesh
       const ctx = canvasRef.current.getContext("2d");
 
       // 5. TODO - Update drawing utility
       // drawSomething(obj, ctx)  
+      drawRectangle(obj,ctx); //passes params to utilities file  
     }
   };
 
@@ -90,6 +95,8 @@ function App() {
           }}
         />
       </header>
+      <h1>we detect a</h1>
+      <h1>{objectName}</h1>
     </div>
   );
 }
